@@ -35,7 +35,7 @@ func getResult(buf []int) int {
 	// hey at least it's not bubble sort
 	for i := 0; i < len(buf); i++ {
 		for j := i; j < len(buf); j++ {
-			for k := i; k < len(buf); k++ {
+			for k := j; k < len(buf); k++ {
 				if buf[i] + buf[j] + buf[k] == 2020 {
 					result = buf[i] * buf[j] * buf[k]
 				}
