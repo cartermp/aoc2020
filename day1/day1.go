@@ -8,7 +8,13 @@ import (
 	"strconv"
 )
 
-func parseData(file *os.File) []int {
+func parseData() []int {
+    file, err := os.Open("input.txt")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer file.Close()
+
 	scanner := bufio.NewScanner(file)
 	buf := make([]int, 0)
 
@@ -47,14 +53,7 @@ func getResult(buf []int) int {
 }
 
 func main() {
-    file, err := os.Open("input.txt")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer file.Close()
-
-    buf := parseData(file)
+    buf := parseData()
 	result := getResult(buf)
-	
 	fmt.Println(result)
 }
