@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type PasswordData struct {
+type passwordData struct {
 	minOcc         int
 	maxOcc         int
 	requiredLetter string
@@ -18,7 +18,7 @@ type PasswordData struct {
 	fullText       string
 }
 
-func parseData() []PasswordData {
+func parseData() []passwordData {
 	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -26,7 +26,7 @@ func parseData() []PasswordData {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	passwords := make([]PasswordData, 0)
+	passwords := make([]passwordData, 0)
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -36,13 +36,17 @@ func parseData() []PasswordData {
 		letterPart := regexp.MustCompile("[a-z]:").FindString(line)
 		passwordPart := regexp.MustCompile(": [a-zA-Z]+").FindString(line)
 
-		min, _ := strconv.Atoi(strings.Trim(minPart, "-"))
-		max, _ := strconv.Atoi(strings.Trim(maxPart, "-"))
+		min, minErr := strconv.Atoi(strings.Trim(minPart, "-"))
+		max, maxErr := strconv.Atoi(strings.Trim(maxPart, "-"))
 		letter := strings.Trim(letterPart, ":")
 		password := strings.Trim(passwordPart, ": ")
 
+		if minErr != nil || maxErr != nil {
+			continue
+		}
+
 		data :=
-			PasswordData{
+			passwordData{
 				minOcc:         min,
 				maxOcc:         max,
 				requiredLetter: letter,
@@ -60,12 +64,11 @@ func parseData() []PasswordData {
 	return passwords
 }
 
-func getValidPasswords(passwords []PasswordData) []PasswordData {
-	validPasswords := make([]PasswordData, 0)
+func getValidPasswords(passwords []passwordData) []passwordData {
+	validPasswords := make([]passwordData, 0)
 
-	for i := 0; i < len(passwords); i++ {
-		passwordData := passwords[i]
-		letterCount := strings.Count(passwordData.fullText, passwordData.requiredLetter)
+	for _, passwordData := range passwords {
+		letterCount := strings.Count(passwordData.password, passwordData.requiredLetter)
 		if letterCount >= passwordData.minOcc && letterCount <= passwordData.maxOcc {
 			validPasswords = append(validPasswords, passwordData)
 		}
