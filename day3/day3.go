@@ -5,20 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
-	"strconv"
-	"strings"
+	// "regexp"
+	// "strconv"
+	// "strings"
 )
 
-type passwordData struct {
-	minOcc         int
-	maxOcc         int
-	requiredLetter string
-	password       string
-	fullText       string
-}
-
-func parseData() []passwordData {
+func parseData(){
 	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -26,59 +18,36 @@ func parseData() []passwordData {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	passwords := make([]passwordData, 0)
 
+	oneTime := false
+	idx := 0
+	treeCount := 0
+	lineCount := 0
 	for scanner.Scan() {
-		line := scanner.Text()
-
-		minPart := regexp.MustCompile("[0-9]+-").FindString(line)
-		maxPart := regexp.MustCompile("-[0-9]+").FindString(line)
-		letterPart := regexp.MustCompile("[a-z]:").FindString(line)
-		passwordPart := regexp.MustCompile(": [a-zA-Z]+").FindString(line)
-
-		min, minErr := strconv.Atoi(strings.Trim(minPart, "-"))
-		max, maxErr := strconv.Atoi(strings.Trim(maxPart, "-"))
-		letter := strings.Trim(letterPart, ":")
-		password := strings.Trim(passwordPart, ": ")
-
-		if minErr != nil || maxErr != nil {
+		if oneTime {
+			oneTime = false
+			idx += 3
+			lineCount++
 			continue
 		}
 
-		data :=
-			passwordData{
-				minOcc:         min,
-				maxOcc:         max,
-				requiredLetter: letter,
-				password:       password,
-				fullText:       line,
-			}
+		line := scanner.Text()
+		
+		if line[idx % len(line)] == '#' {
+			treeCount++
+		}
 
-		passwords = append(passwords, data)
+		lineCount++
+		idx += 3
 	}
+
+	fmt.Printf("Tree count: %d\n", treeCount)
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-
-	return passwords
-}
-
-func getValidPasswords(passwords []passwordData) []passwordData {
-	validPasswords := make([]passwordData, 0)
-
-	for _, passwordData := range passwords {
-		letterCount := strings.Count(passwordData.password, passwordData.requiredLetter)
-		if letterCount >= passwordData.minOcc && letterCount <= passwordData.maxOcc {
-			validPasswords = append(validPasswords, passwordData)
-		}
-	}
-
-	return validPasswords
 }
 
 func main() {
-	passwords := parseData()
-	result := getValidPasswords(passwords)
-	fmt.Println(len(result))
+	parseData()
 }
