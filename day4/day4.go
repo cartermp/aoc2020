@@ -21,7 +21,7 @@ type passport struct {
 }
 
 func parseData() []passport {
-	file, err := os.Open("test-input.txt")
+	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,9 +35,8 @@ func parseData() []passport {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if line == "\n" || line == "\r\n" {
+		if len(line) == 0 {
 			if (currPassport != passport{}) {
-				fmt.Println("got one")
 				passports = append(passports, currPassport)
 				currPassport = passport{}
 			}
@@ -45,7 +44,7 @@ func parseData() []passport {
 		}
 
 		if currPassport.byr == "" {
-			currPassport.byr = regexp.MustCompile("byr:[a-zA-Z]+").FindString(line)
+			currPassport.byr = regexp.MustCompile("byr:[0-9]+").FindString(line)
 		}
 
 		if currPassport.iyr == "" {
@@ -61,7 +60,7 @@ func parseData() []passport {
 		}
 
 		if currPassport.hcl == "" {
-			currPassport.hcl = regexp.MustCompile("hcl:#[a-zA-Z]+").FindString(line)
+			currPassport.hcl = regexp.MustCompile("hcl:#?[a-zA-Z]+").FindString(line)
 		}
 
 		if currPassport.ecl == "" {
@@ -75,6 +74,10 @@ func parseData() []passport {
 		if currPassport.cid == "" {
 			currPassport.cid = regexp.MustCompile("cid:[0-9]+").FindString(line)
 		}
+	}
+
+	if (currPassport != passport{}) {
+		passports = append(passports, currPassport)
 	}
 
 	if err := scanner.Err(); err != nil {

@@ -11,3 +11,8 @@ hgt:179cm
 
 hcl:#cfa07d eyr:2025 pid:166559648
 iyr:2011 ecl:brn hgt:59in
+
+hcl:z cid:92 hgt:69cm
+byr:2008 pid:492284612
+eyr:2020 iyr:2023
+ecl:hzl
