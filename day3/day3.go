@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	// "regexp"
-	// "strconv"
-	// "strings"
 )
 
-func parseData(){
+func readData() []string {
 	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -19,35 +16,51 @@ func parseData(){
 
 	scanner := bufio.NewScanner(file)
 
-	oneTime := false
-	idx := 0
-	treeCount := 0
-	lineCount := 0
+	data := make([]string, 0)
 	for scanner.Scan() {
-		if oneTime {
-			oneTime = false
-			idx += 3
-			lineCount++
-			continue
-		}
-
 		line := scanner.Text()
-		
-		if line[idx % len(line)] == '#' {
-			treeCount++
-		}
-
-		lineCount++
-		idx += 3
+		data = append(data, line)
 	}
-
-	fmt.Printf("Tree count: %d\n", treeCount)
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+
+	return data
+}
+
+func doWork(data []string, right int, down int) int {
+	treeCount := 0
+	tobogganIdx := right
+	first := true
+
+	for i := 0; i < len(data); i += down {
+		if first {
+			first = false
+			continue
+		}
+
+		line := data[i]
+		toCheck := tobogganIdx % len(line)
+		if line[toCheck] == '#' {
+			treeCount++
+		}
+
+		tobogganIdx += right
+	}
+
+	return treeCount
 }
 
 func main() {
-	parseData()
+	data := readData()
+
+	one := doWork(data, 1, 1)
+	two := doWork(data, 3, 1)
+	three := doWork(data, 5, 1)
+	four := doWork(data, 7, 1)
+	five := doWork(data, 1, 2)
+
+	res := one * two * three * four * five
+	fmt.Println(res)
 }
